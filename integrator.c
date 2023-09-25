@@ -16,22 +16,33 @@ double integrator(double lowerlim, double upperlim, double errtol, double T,doub
     double ans = 0;
 
     //https://en.wikipedia.org/wiki/Gaussian_quadrature#Change_of_interval
+    //Note, for ease of computation, the integration interval is truncated at 
+    //x=25 for a simpler scheme (B(x) < 1e-10 for x > 25)
     //Compute coefficient
-    double C = 2*h*h/(25*kb*T*c*c);
+    double C = h*h/(6.25*kb*T*c*c);
 
     //10 Point
     for (int i=0;i<10;i++){
-        rough_ans += C*wi[i]*integrand((25*kb*T/h)*(xi[i]+1),T,coeff);
+        rough_ans += C*wi[i]*integrand((12.5*kb*T/h)*(xi[i]+1),T,coeff);
     }
     //21 Point
     for (int i=0; i<21; i++){
-        ans += C*wi2[i]*integrand((25*kb*T/h)*(xi2[i]+1),T,coeff);
+        ans += C*wi2[i]*integrand((12.5*kb*T/h)*(xi2[i]+1),T,coeff);
     }
     
     //If error tolerance not met, then split the interval and recurse
     if ( (abs(ans-rough_ans)/(upperlim-lowerlim)) > errtol){
         double mid = 0.5*(upperlim-lowerlim);
-        ans = integrator(lowerlim,mid,errtol,T,coeff) + integrator(mid,upperlim,errtol,T,coeff);
+        ans = integrator(lowerlim,mid,errtol,T,coeff) + 
+            integrator(mid,upperlim,errtol,T,coeff);
     }
     return ans;
+}
+
+//Test Function to run through the above functions
+int main(void){
+
+    
+
+    return 0;
 }
